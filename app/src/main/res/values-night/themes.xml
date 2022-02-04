@@ -1,9 +1,9 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.WhatsAppClone" parent="Theme.MaterialComponents.Light.NoActionBar">
+    <style name="Theme.WhatsAppClone" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">#075e54</item>
-        <item name="colorPrimaryVariant">#054d44</item>
+        <item name="colorPrimary">#128C7E</item>
+        <item name="colorPrimaryVariant">#075E54</item>
         <item name="colorOnPrimary">#25d366</item>
         <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/teal_200</item>
