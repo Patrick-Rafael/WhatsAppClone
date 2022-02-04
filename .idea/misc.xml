@@ -6,10 +6,13 @@
         <entry key="..\:/Users/Patri/AndroidStudioProjects/WhatsAppClone/app/src/main/res/layout/activity_cadastro.xml" value="0.3161231884057971" />
         <entry key="..\:/Users/Patri/AndroidStudioProjects/WhatsAppClone/app/src/main/res/layout/activity_login.xml" value="0.32065217391304346" />
         <entry key="..\:/Users/Patri/AndroidStudioProjects/WhatsAppClone/app/src/main/res/layout/activity_main.xml" value="0.32065217391304346" />
+        <entry key="..\:/Users/Patrick/AndroidStudioProjects/Teste/WhatsAppClone/app/src/main/res/layout/activity_main.xml" value="0.25" />
+        <entry key="..\:/Users/Patrick/AndroidStudioProjects/Teste/WhatsAppClone/app/src/main/res/layout/toolbar.xml" value="0.18819655521783182" />
+        <entry key="..\:/Users/Patrick/AndroidStudioProjects/Teste/WhatsAppClone/app/src/main/res/menu/menu_principal.xml" value="0.33" />
       </map>
     </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="11" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>
   <component name="ProjectType">

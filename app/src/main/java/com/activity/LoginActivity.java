@@ -18,6 +18,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthInvalidUserException;
+import com.google.firebase.auth.FirebaseUser;
 import com.patrickrafael.whatsappclone.R;
 
 public class LoginActivity extends AppCompatActivity {
@@ -44,6 +45,16 @@ public class LoginActivity extends AppCompatActivity {
         Intent intent = new Intent(LoginActivity.this, CadastroActivity.class);
         startActivity(intent);
 
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        //Entrada automatica
+        FirebaseUser usuarioAtual = autenticacao.getCurrentUser();
+        if( usuarioAtual!= null){
+            telaPrincipal();
+        }
     }
 
     public  void telaPrincipal (){
