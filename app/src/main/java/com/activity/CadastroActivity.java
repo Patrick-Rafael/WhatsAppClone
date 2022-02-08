@@ -17,6 +17,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
+import com.helper.Base64Custom;
 import com.patrickrafael.whatsappclone.R;
 
 public class CadastroActivity extends AppCompatActivity {
@@ -94,6 +95,17 @@ public class CadastroActivity extends AppCompatActivity {
 
                     Toast.makeText(CadastroActivity.this, "Sucesso ao cadastrar Usuário", Toast.LENGTH_LONG).show();
                     finish();
+
+                    try {
+
+                        String idUsuario = Base64Custom.codificarBase64(usuario.getEmail());
+                        usuario.setId(idUsuario);
+                        usuario.salvar();
+
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+
 
                 } else {
                     String excecao = "";
