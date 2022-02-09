@@ -18,8 +18,8 @@
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/fotoPerfilCircle"
-        android:layout_width="200dp"
-        android:layout_height="150dp"
+        android:layout_width="230dp"
+        android:layout_height="230dp"
 
         android:layout_marginBottom="16dp"
         android:src="@drawable/padrao"
