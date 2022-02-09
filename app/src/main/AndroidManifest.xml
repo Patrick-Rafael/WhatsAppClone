@@ -2,6 +2,15 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.patrickrafael.whatsappclone">
 
+    <uses-feature
+
+        android:name="android.hardware.camera"
+        android:required="true"
+
+        >
+
+    </uses-feature>
+
     <uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE">
     </uses-permission>

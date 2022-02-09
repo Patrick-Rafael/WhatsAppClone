@@ -7,8 +7,12 @@ import androidx.appcompat.widget.Toolbar;
 
 import android.Manifest;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.view.View;
+import android.widget.ImageButton;
 
 import com.helper.Permissao;
 import com.patrickrafael.whatsappclone.R;
@@ -22,12 +26,20 @@ public class ConfiguracoesActivity extends AppCompatActivity {
 
     };
 
+    private ImageButton buttonGaleria, buttonCamera;
+    private static final int SELECAO_CAMERA = 100;
+    private static final int SELECAO_Galeria = 200;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_configuracoes);
 
         //Validar permissões
+
+        buttonCamera = findViewById(R.id.imageButtonCamera);
+        buttonGaleria = findViewById(R.id.imageButtonGaleria);
+
 
         Permissao.validarPermissoes(permissoesNecessarias,this, 1);
 
@@ -37,6 +49,19 @@ public class ConfiguracoesActivity extends AppCompatActivity {
 
         //Botão voltar, é necessario alterar o manifest para que a pagina mainActivity seja a pagia "pai".
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        buttonCamera.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                if( intent.resolveActivity(getPackageManager()) != null ){
+
+                }
+                startActivityForResult(intent, SELECAO_CAMERA );
+
+            }
+        });
 
     }
 
