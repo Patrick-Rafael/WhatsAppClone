@@ -15,14 +15,19 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.config.ConfigFireBase;
 import com.google.android.gms.auth.api.signin.internal.Storage;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.helper.Base64Custom;
@@ -50,6 +55,7 @@ public class ConfiguracoesActivity extends AppCompatActivity {
     private CircleImageView circleImageViewPerfil;
     private StorageReference storageReference;
     private String identificadorUsuario;
+    private EditText editeNomePerfil;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +70,7 @@ public class ConfiguracoesActivity extends AppCompatActivity {
         buttonCamera = findViewById(R.id.imageButtonCamera);
         buttonGaleria = findViewById(R.id.imageButtonGaleria);
         circleImageViewPerfil = findViewById(R.id.fotoPerfilCircle);
+        editeNomePerfil = findViewById(R.id.editNomeUsuarioPerfil);
 
 
         Permissao.validarPermissoes(permissoesNecessarias, this, 1);
@@ -74,6 +81,21 @@ public class ConfiguracoesActivity extends AppCompatActivity {
 
         //Botão voltar, é necessario alterar o manifest para que a pagina mainActivity seja a pagia "pai".
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        //Recuperar dados do Usuario
+        FirebaseUser usuario = UsuarioFireBase.getUsuarioAtual();
+        Uri url =  usuario.getPhotoUrl();
+
+        if(url != null){
+            Glide.with(ConfiguracoesActivity.this).load(url).into(circleImageViewPerfil);
+
+        }else {
+            circleImageViewPerfil.setImageResource(R.drawable.padrao);
+        }
+
+        editeNomePerfil.setText(usuario.getDisplayName());
+
+
 
         buttonCamera.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -135,7 +157,7 @@ public class ConfiguracoesActivity extends AppCompatActivity {
                     byte[] dadosImagem = baos.toByteArray();
 
                     //Salvar imagem firebase
-                    StorageReference imagemRef = storageReference
+                   final StorageReference imagemRef = storageReference
                             .child("imagens")
                             .child("perfil")
                            // .child(identificadorUsuario)
@@ -155,9 +177,17 @@ public class ConfiguracoesActivity extends AppCompatActivity {
                             Toast.makeText(ConfiguracoesActivity.this,
                                     "Sucesso ao fazer upload da imagem", Toast.LENGTH_LONG).show();
 
+
+                            imagemRef.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Uri> task) {
+                                    Uri url = task.getResult() ;
+                                    atualizarFotoUsuario(url);
+                                }
+                            });
+
                         }
                     });
-
 
 
                 }
@@ -167,6 +197,13 @@ public class ConfiguracoesActivity extends AppCompatActivity {
             }
 
         }
+    }
+
+    public void atualizarFotoUsuario(Uri url){
+        UsuarioFireBase.atualizarFotoUsuario(url);
+
+
+
     }
 
     @Override

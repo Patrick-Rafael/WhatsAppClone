@@ -18,6 +18,7 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.helper.Base64Custom;
+import com.helper.UsuarioFireBase;
 import com.patrickrafael.whatsappclone.R;
 
 public class CadastroActivity extends AppCompatActivity {
@@ -94,6 +95,9 @@ public class CadastroActivity extends AppCompatActivity {
                 if (task.isSuccessful()) {
 
                     Toast.makeText(CadastroActivity.this, "Sucesso ao cadastrar Usuário", Toast.LENGTH_LONG).show();
+
+                    UsuarioFireBase.atualizarNomeDoUsuario(usuario.getNome());
+
                     finish();
 
                     try {
