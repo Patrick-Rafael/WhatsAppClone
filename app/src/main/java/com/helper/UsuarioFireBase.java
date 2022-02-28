@@ -5,6 +5,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.Model.Usuario;
 import com.config.ConfigFireBase;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -78,6 +79,23 @@ public class UsuarioFireBase {
         }
 
 
+    }
+
+    public static Usuario getDadosUsuaruiLogado(){
+
+        FirebaseUser fireBaseUser = getUsuarioAtual();
+        Usuario usuario = new Usuario();
+        usuario.setEmail(fireBaseUser.getEmail());
+        usuario.setNome(fireBaseUser.getDisplayName());
+
+        if (fireBaseUser.getPhotoUrl() == null){
+            usuario.setFoto("");
+
+
+        }else {
+            usuario.setFoto(fireBaseUser.getPhotoUrl().toString());
+        }
+        return usuario;
     }
 
 
