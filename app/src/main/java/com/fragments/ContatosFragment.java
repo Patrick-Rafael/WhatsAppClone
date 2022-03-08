@@ -2,6 +2,7 @@ package com.fragments;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -12,6 +13,11 @@ import android.view.ViewGroup;
 
 import com.Model.Usuario;
 import com.adapter.ContatosAdapter;
+import com.config.ConfigFireBase;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 import com.patrickrafael.whatsappclone.R;
 
 import java.util.ArrayList;
@@ -29,6 +35,8 @@ public class ContatosFragment extends Fragment {
     private RecyclerView recyclerListaContatos;
     private ContatosAdapter adapter;
     private ArrayList<Usuario> listaContatos = new ArrayList<>();
+    private DatabaseReference usuariosRef;
+    private ValueEventListener valueEventListenerContatos;
 
     public ContatosFragment() {
 
@@ -57,13 +65,14 @@ public class ContatosFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view =  inflater.inflate(R.layout.fragment_contatos, container, false);
+        View view = inflater.inflate(R.layout.fragment_contatos, container, false);
 
         //Configurar Recycyler
         recyclerListaContatos = view.findViewById(R.id.recyclerListaContatos);
+        usuariosRef = ConfigFireBase.getFireBaseDataBase().child("usuarios");
 
         //Adapter
-        adapter = new ContatosAdapter(listaContatos,getActivity());
+        adapter = new ContatosAdapter(listaContatos, getActivity());
 
 
         //Recycler
@@ -74,5 +83,38 @@ public class ContatosFragment extends Fragment {
 
 
         return view;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        recuperarContatos();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        usuariosRef.removeEventListener(valueEventListenerContatos);
+    }
+
+    public void recuperarContatos() {
+      valueEventListenerContatos  =  usuariosRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot dados : snapshot.getChildren()) {
+                    Usuario usuario = dados.getValue(Usuario.class);
+                    listaContatos.add(usuario);
+
+                }
+
+                adapter.notifyDataSetChanged();
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 }
