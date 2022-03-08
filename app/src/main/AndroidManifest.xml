@@ -1,23 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.patrickrafael.whatsappclone">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.patrickrafael.whatsappclone" >
 
     <uses-feature
-
         android:name="android.hardware.camera"
-        android:required="true"
+        android:required="true" />
 
-        >
-
-    </uses-feature>
-
-    <uses-permission
-        android:name="android.permission.READ_EXTERNAL_STORAGE">
-    </uses-permission>
-
-    <uses-permission
-        android:name="android.permission.CAMERA">
-    </uses-permission>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <application
         android:allowBackup="true"
@@ -25,7 +16,13 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.WhatsAppClone">
+        android:theme="@style/Theme.WhatsAppClone"
+        tools:ignore="ExtraText">
+        <activity
+            android:name="com.activity.ChatActivity"
+            android:exported="false"
+            android:parentActivityName="com.activity.MainActivity"
+            />
         <activity
             android:name="com.activity.ConfiguracoesActivity"
             android:exported="false"
@@ -38,7 +35,7 @@
             android:exported="false" />
         <activity
             android:name="com.activity.LoginActivity"
-            android:exported="true">
+            android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
