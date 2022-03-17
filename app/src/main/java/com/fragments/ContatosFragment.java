@@ -97,9 +97,10 @@ public class ContatosFragment extends Fragment {
                         new RecyclerItemClickListener.OnItemClickListener() {
                             @Override
                             public void onItemClick(View view, int position) {
-
+                                Usuario usuarioSelecionadado = listaContatos.get(position);
 
                                 Intent i = new Intent(getActivity(), ChatActivity.class);
+                                i.putExtra("chatContato", usuarioSelecionadado );
                                 startActivity(i);
 
                             }
