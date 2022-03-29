@@ -12,7 +12,6 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.service.controls.actions.FloatAction;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -20,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.Model.Conversa;
 import com.Model.Mensagem;
 import com.Model.Usuario;
 import com.adapter.MensagensAdapter;
@@ -203,6 +203,7 @@ public class ChatActivity extends AppCompatActivity {
         }
     }
 
+
     public void enviarMensagem(View view) {
 
         String textoMensagem = editMensagem.getText().toString();
@@ -218,6 +219,9 @@ public class ChatActivity extends AppCompatActivity {
 
             //Salvar Mensagem para o Destinatario
             salvarMensagem(idUsuarioDestinatario, idUsuarioRementente, mensagem);
+
+            //Salvar Conversa
+            salvarConversa(mensagem);
 
 
         } else {
@@ -297,6 +301,19 @@ public class ChatActivity extends AppCompatActivity {
         editMensagem = findViewById(R.id.editMensagem);
         recyclerMensagens = findViewById(R.id.recyclerMensagens);
         imageCamera = findViewById(R.id.imageCamera);
+
+    }
+
+    private void salvarConversa(Mensagem msg){
+
+        Conversa conversaRemetente = new Conversa();
+        conversaRemetente.setIdRemetente(idUsuarioRementente);
+        conversaRemetente.setIdDestinatario(idUsuarioDestinatario);
+        conversaRemetente.setUltimaMensagem(msg.getMensagem());
+        conversaRemetente.setUsuarioExibido( usuarioDestinatario );
+
+        conversaRemetente.salvar();
+
 
     }
 }
