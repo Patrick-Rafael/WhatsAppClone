@@ -7,11 +7,16 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.service.controls.actions.FloatAction;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,17 +25,25 @@ import com.Model.Usuario;
 import com.adapter.MensagensAdapter;
 import com.bumptech.glide.Glide;
 import com.config.ConfigFireBase;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.helper.Base64Custom;
 import com.helper.UsuarioFireBase;
 import com.patrickrafael.whatsappclone.R;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -48,6 +61,9 @@ public class ChatActivity extends AppCompatActivity {
     private DatabaseReference database;
     private DatabaseReference mensagensRef;
     private ChildEventListener childEventListenerMensagens;
+    private ImageView imageCamera;
+    private static final int SELECAO_CAMERA = 100;
+    private StorageReference storage;
 
 
     @Override
@@ -94,12 +110,97 @@ public class ChatActivity extends AppCompatActivity {
         recyclerMensagens.setHasFixedSize(true);
         recyclerMensagens.setAdapter(adapterMensagens);
 
+        storage = ConfigFireBase.getFirebaseStorage();
         database = ConfigFireBase.getFireBaseDataBase();
         mensagensRef = database.child("mensagens")
                 .child(idUsuarioRementente)
                 .child(idUsuarioDestinatario);
 
+        //Evento de clique na camera
+        imageCamera.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
+                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                if (intent.resolveActivity(getPackageManager()) != null) {
+                    startActivityForResult(intent, SELECAO_CAMERA);
+
+                }
+            }
+        });
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode == RESULT_OK) {
+            Bitmap imagem = null;
+
+            try {
+
+                switch (requestCode) {
+                    case SELECAO_CAMERA:
+                        imagem = (Bitmap) data.getExtras().get("data");
+                        break;
+                }
+
+                if (imagem != null) {
+
+                    //Recuperar dados da imagem
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    imagem.compress(Bitmap.CompressFormat.JPEG, 70, baos);
+                    byte[] dadosImagem = baos.toByteArray();
+
+                    //Criar nome da imagem
+                    String nomeImagem = UUID.randomUUID().toString();
+
+                    //Configurar Referencia firebase
+
+                    final StorageReference imagemRef = storage.child("imagens").child("fotos").child(idUsuarioRementente).child(nomeImagem);
+
+                    UploadTask uploadTask = imagemRef.putBytes(dadosImagem);
+                    uploadTask.addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.d("Erro", "Erro ao fazer upload");
+                            Toast.makeText(ChatActivity.this,
+                                    "Erro ao fazer upload da imagem", Toast.LENGTH_LONG).show();
+                        }
+                    }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+
+                            imagemRef.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Uri> task) {
+                                    String url = task.getResult().toString();
+
+                                    Mensagem mensagem = new Mensagem();
+                                    mensagem.setIdUsuario(idUsuarioRementente);
+                                    mensagem.setMensagem("imagem.jpeg");
+                                    mensagem.setImagem(url);
+
+                                    //Mensagem para o remetente
+                                    salvarMensagem(idUsuarioRementente, idUsuarioDestinatario, mensagem);
+
+                                    //Salvar Mensagem para o Destinatario
+                                    salvarMensagem(idUsuarioDestinatario, idUsuarioRementente, mensagem);
+
+                                    Toast.makeText(ChatActivity.this,
+                                            "Sucesso ao enviar imagem", Toast.LENGTH_LONG).show();
+
+                                }
+                            });
+                        }
+                    });
+
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public void enviarMensagem(View view) {
@@ -119,7 +220,6 @@ public class ChatActivity extends AppCompatActivity {
             salvarMensagem(idUsuarioDestinatario, idUsuarioRementente, mensagem);
 
 
-
         } else {
             Toast.makeText(ChatActivity.this, "Digite uma mensagem para enviar!", Toast.LENGTH_LONG).show();
 
@@ -130,9 +230,9 @@ public class ChatActivity extends AppCompatActivity {
     private void salvarMensagem(String idRementente, String idDestinatario, Mensagem mensagem) {
 
         DatabaseReference database = ConfigFireBase.getFireBaseDataBase();
-        DatabaseReference mensagensRef  = database.child("mensagens");
+        DatabaseReference mensagensRef = database.child("mensagens");
 
-                mensagensRef.child(idRementente)
+        mensagensRef.child(idRementente)
                 .child(idDestinatario)
                 .push()
                 .setValue(mensagem);
@@ -156,36 +256,36 @@ public class ChatActivity extends AppCompatActivity {
         mensagensRef.removeEventListener(childEventListenerMensagens);
     }
 
-    private void recuperarMensagem(){
+    private void recuperarMensagem() {
 
-       childEventListenerMensagens = mensagensRef.addChildEventListener(new ChildEventListener() {
-           @Override
-           public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-               Mensagem mensagem = snapshot.getValue(Mensagem.class);
-               mensagens.add(mensagem);
-               adapterMensagens.notifyDataSetChanged();
-           }
+        childEventListenerMensagens = mensagensRef.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                Mensagem mensagem = snapshot.getValue(Mensagem.class);
+                mensagens.add(mensagem);
+                adapterMensagens.notifyDataSetChanged();
+            }
 
-           @Override
-           public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
 
-           }
+            }
 
-           @Override
-           public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
 
-           }
+            }
 
-           @Override
-           public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
 
-           }
+            }
 
-           @Override
-           public void onCancelled(@NonNull DatabaseError error) {
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
 
-           }
-       });
+            }
+        });
 
     }
 
@@ -196,6 +296,7 @@ public class ChatActivity extends AppCompatActivity {
         buttonMenssagem = findViewById(R.id.fabEnviar);
         editMensagem = findViewById(R.id.editMensagem);
         recyclerMensagens = findViewById(R.id.recyclerMensagens);
+        imageCamera = findViewById(R.id.imageCamera);
 
     }
 }
